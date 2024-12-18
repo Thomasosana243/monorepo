@@ -1,5 +1,4 @@
 import express from "express";
-import type { RequestHandler } from "express";
 
 const router = express.Router();
 
@@ -9,35 +8,40 @@ const router = express.Router();
 
 // Define item-related routes
 import itemActions from "./modules/item/itemActions";
-
 router.get("/api/items", itemActions.browse);
 router.get("/api/items/:id", itemActions.read);
 router.post("/api/items", itemActions.add);
 
-/* ************************************************************************* */
-// Route pour obtenir la liste des séries
-const programs = [
-  { id: 1, title: "Stranger Things", genre: "Science-fiction" },
-  { id: 2, title: "Breaking Bad", genre: "Drame" },
-  { id: 3, title: "Game of Thrones", genre: "Fantasy" },
-  { id: 4, title: "The Crown", genre: "Drame historique" },
-  { id: 5, title: "Narcos", genre: "Policier" },
-];
+// Define program-related routes
+import programActions from "./modules/program/programActions";
+router.get("/api/programs", programActions.browse);
+router.get("/api/programs/:id", programActions.read);
 
-// Route GET /api/programs
-router.get("/api/programs", (req, res) => {
-  res.json(programs);
+// Define category-related routes
+import { getCategories, getCategoryById } from "./modules/category/categoryActions"; // Assurez-vous que le chemin est correct
+
+// Route pour récupérer toutes les catégories
+router.get("/api/categories", (req, res) => {
+  const categories = getCategories();
+  res.status(200).json(categories); // Retourne la liste des catégories
+});
+
+// Route pour récupérer une catégorie spécifique par ID
+router.get("/api/categories/:id", (req, res) => {
+  const { id } = req.params;
+  const category = getCategoryById(Number(id)); // Convertir l'ID en nombre
+  if (category) {
+    res.status(200).json(category); // Retourne la catégorie trouvée
+  } else {
+    res.status(404).json({ message: "Category not found" }); // Retourne une erreur si non trouvée
+  }
 });
 
 /* ************************************************************************* */
 
 // Declaration of a "Welcome" route
-
-const sayWelcome: RequestHandler = (req, res) => {
-  res.send("Welcome to Wild Series !");
-};
-
-router.get("/", sayWelcome);
+import sayActions from "./modules/say/sayActions";
+router.get("/", sayActions.sayWelcome);
 
 /* ************************************************************************* */
 
